@@ -13,10 +13,10 @@ def on_closing():
     save_all(all_characters)
     main.destroy()
 
-
+current_company = None
 all_characters = []
 
-open_all(all_characters)
+#open_all(all_characters)
 
 # ----------------------------------------------------------------------------------------------------------------------
 holder = tk.Frame(root, bg='#555')
@@ -33,14 +33,15 @@ for i in range(5):
     holder.character_images.append(CharacterImage(holder, lb1, i, all_characters, custom_item_frame, search_frame,
                                    select_listbox_menubutton))
 test = Menubar(holder, all_characters, lb1, holder)
+test2 = CompanyBar(holder, current_company)
 # ----------------------------------------------------------------------------------------------------------------------
 main.protocol("WM_DELETE_WINDOW", on_closing)
 
 # test:
 #test.switch_char_images()
-#holder.character_images[0].attach_a_character(all_characters[2])
+#holder.character_images[0].attach_a_character(all_characters[0])
 #holder.character_images[1].attach_a_character(all_characters[1])
-#holder.character_images[2].attach_a_character(all_characters[0])
+#holder.character_images[2].attach_a_character(all_characters[2])
 
 
 if __name__ == '__main__':
