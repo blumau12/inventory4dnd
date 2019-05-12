@@ -16,7 +16,7 @@ def on_closing():
 current_company = None
 all_characters = []
 
-#open_all(all_characters)
+open_all(all_characters)
 
 # ----------------------------------------------------------------------------------------------------------------------
 holder = tk.Frame(root, bg='#555')
