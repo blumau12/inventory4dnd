@@ -1,4 +1,4 @@
-from inv4dnd_main_classes import *
+from main_classes import *
 from tkinter import messagebox
 import pickle
 import utilities.pop_up_desc as pop_up_desc

@@ -1,4 +1,4 @@
-from inv4dnd_classes import *
+from classes import *
 
 old_characters = []
 new_characters = []
