@@ -29,12 +29,12 @@ holder.place(x=268, y=0, relwidth=1, relheight=1)
 
 # items bar:
 custom_item_frame = CustomItemFrame(items_bar_holder)
-lb1 = ItemsListBoxFrame(items_bar_holder, 'items library\\items_main.txt', y=83, relheight=1, height=-83)
+lb1 = ItemsListBoxFrame(items_bar_holder, y=83, relheight=1, height=-83)
 search_frame = SearchFrame(items_bar_holder, lb1)
 select_listbox_menubutton = SelectListboxMenubutton(items_bar_holder, lb1, search_frame)
 
 # menu bar:
-menu_bar = Menubar(holder, all_characters, lb1, holder)
+menu_bar = MenuBar(holder, all_characters, lb1, holder)
 
 # company bar:
 company_bar = CompanyBar(holder, current_company)

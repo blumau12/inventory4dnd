@@ -1,6 +1,6 @@
 from os.path import join as join_path, isfile
 
-categories_ordered = ['main', 'weapons', 'armors', 'instruments', 'services', 'transport', 'animals', 'goods', 'naval']
+categories_ordered = ['equipment', 'weapons', 'armors', 'instruments', 'services', 'transport', 'animals', 'goods', 'naval']
 
 
 class Category:
@@ -15,7 +15,7 @@ class Category:
             self.items[item[0]] = [item[1], item[2]]
 
     def __repr__(self):
-        return str({self.name: self.items})
+        return 'category "{0}": {1}'.format(self.name, self.items)
 
 
 categories = []
