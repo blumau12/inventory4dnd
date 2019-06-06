@@ -18,9 +18,8 @@ class CharacterImage(tk.Frame):
         self.owner = None
         self.states = ['inventory', 'states']
         self.state = 0
-        self.states_label = None
 
-        self.header = tk.Frame(self)
+        self.header = tk.Frame(self, bg='red')
         self.header.place(height=40, relwidth=1, width=-17)
 
         self.name_label = tk.Button(self.header, bd=0, bg='#EEE', justify=tk.CENTER, font='Cambria 14',
@@ -86,26 +85,11 @@ class CharacterImage(tk.Frame):
             if self.items_zone:
                 self.items_zone.destroy()
 
-            # scrollbar to items_zone frame ------------------------------------------------------------------------
-            general_items_zone = tk.Frame(self)
-            general_items_zone.place(x=0, y=41, relwidth=1, relheight=1, height=-41)
-
-            def scroll_to_canvas(event):
-                canvas.configure(scrollregion=canvas.bbox("all"), width=200, height=200)
-
-            canvas = tk.Canvas(general_items_zone, bd=0, selectborderwidth=0, highlightthickness=0)
-            self.items_zone = tk.Frame(canvas)
-            my_scrollbar = tk.Scrollbar(general_items_zone, orient="vertical", command=canvas.yview)
-            canvas.configure(yscrollcommand=my_scrollbar.set)
-
-            my_scrollbar.pack(side="right", fill="y")
-            canvas.place(relwidth=1, relheight=1)
-            self.items_zone.bind("<Configure>", scroll_to_canvas)
-
             # next -------------------------------------------------------------------------------------------------
             self.total_weights['text'] = 'Вес\n' + str(self.owner.total_weight)
             self.total_costs['text'] = 'Цена\n' + str(self.owner.total_cost)
             position = 0
+            print(list(self.owner.container))
             temp_categories = sorted(list(self.owner.container),
                                      key=lambda x: self.select_listbox_menubutton.categories.index(x))
             for category in temp_categories:
@@ -163,9 +147,66 @@ class CharacterImage(tk.Frame):
             self.refresh()
 
 
+class InventoryFrame(tk.Frame):
+    def __init__(self, root, **kwargs):
+        super().__init__(root, **kwargs)
+        self.canvas = tk.Canvas(self)
+        self.frame = tk.Frame(self.canvas)
+        self.scrollbar = tk.Scrollbar(self, orient="vertical", command=self.canvas.yview)
+        self.canvas.configure(yscrollcommand=self.scrollbar.set)
+
+        def config_canvas(event):
+            self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+
+        self.scrollbar.place(relx=1, x=-15, relheight=1)
+        self.canvas.place(relheight=1, relwidth=1)
+        self.canvas.create_window((0, 0), window=self.frame, anchor='nw')
+
+        self.frame.bind("<Configure>", config_canvas)
+
+    def refresh(self):
+        if self.frame:
+            self.items_zone.destroy()
+
+        # next -------------------------------------------------------------------------------------------------
+        self.total_weights['text'] = 'Вес\n' + str(self.owner.total_weight)
+        self.total_costs['text'] = 'Цена\n' + str(self.owner.total_cost)
+        position = 0
+        print(list(self.owner.container))
+        temp_categories = sorted(list(self.owner.container),
+                                 key=lambda x: self.select_listbox_menubutton.categories.index(x))
+        for category in temp_categories:
+            tk.Label(self.items_zone, text=category + ':', anchor=tk.W, font='Arial 9 bold').place(
+                x=0, y=position * 16, relwidth=0.6, height=15)
+            position += 1
+            temp_items = sorted(self.owner.container[category])
+            for item in temp_items:
+                item.label = tk.Label(self.items_zone, text=item.name)
+                item.label.place(x=0, y=position * 16, relwidth=0.6, height=15)
+                item.label.bind("<Button-3>", item.context_menu)
+                pop_up_desc.button_description(item.label, item.description, self)
+                item.num_entry = tk.Entry(self.items_zone, bd=0, justify=tk.CENTER, takefocus=0,
+                                          bg='SystemMenu')
+                item.num_entry.insert(0, item.amount)
+                item.num_entry.place(relx=0.675, x=-10, y=position * 16, width=20, height=15)
+                item.num_entry.bind("<Button-1>", item.start)
+                item.num_entry.bind("<Leave>", item.unfocus)
+                item.num_entry.bind("<FocusOut>", item.take_entry)
+                tk.Button(self.items_zone, text='-', bd=0, command=item.decrease_amount).place(
+                    relx=0.6, y=position * 16, width=10, height=15)
+                tk.Button(self.items_zone, text='+', bd=0, command=item.increase_amount).place(
+                    relx=0.75, x=-10, y=position * 16, width=10, height=15)
+                tk.Label(self.items_zone, text=item.weight).place(
+                    relx=0.75, y=position * 16, relwidth=0.125, height=15)
+                tk.Label(self.items_zone, text=item.cost).place(
+                    relx=0.875, y=position * 16, relwidth=0.125, height=15)
+                position += 1
+            position += 1
+
+
 class CharacterStatesZone(tk.Frame):
-    def __init__(self, root):
-        super().__init__(root)
+    def __init__(self, root, **kwargs):
+        super().__init__(root, **kwargs)
         # галочки ------------------------------------------------------------------------------------------------------
         self.darkvision_var = tk.IntVar()
         self.darkvision_var.set(self.master.owner.darkvision)
