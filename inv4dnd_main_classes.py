@@ -12,6 +12,7 @@ class Character:
 
         self.is_displayed = False
         self.image = None
+        self.categories_hidden = []
 
         self.darkvision = False
         self.concentration = False

@@ -86,49 +86,15 @@ class CharacterImage(tk.Frame):
     def refresh(self):
         if self.owner:
             if self.states[self.state] == 'inventory':
+                self.total_weights['text'] = 'Вес\n' + str(self.owner.total_weight)
+                self.total_costs['text'] = 'Цена\n' + str(self.owner.total_cost)
                 if self.items_zone:
                     self.items_zone.destroy()
-                self.items_zone = tk.Frame(self)
-                self.items_zone.place(x=0, y=41, relwidth=1, relheight=1, height=-41)
+                if self.owner:
+                    self.items_zone = CharacterInventoryZone(self)
+            elif self.states[self.state] == 'states':
                 self.total_weights['text'] = 'Вес\n' + str(self.owner.total_weight)
                 self.total_costs['text'] = 'Цена\n' + str(self.owner.total_cost)
-                position = 0
-                temp_categories = sorted(list(self.owner.container),
-                                         key=lambda x: self.select_listbox_menubutton.categories.index(x))
-                for category in temp_categories:
-                    tk.Label(self.items_zone, text=category + ':', anchor=tk.W, font='Arial 9 bold').place(
-                        x=0, y=position * 16, relwidth=0.6, height=15)
-                    position += 1
-                    temp_items = sorted(self.owner.container[category])
-                    for item in temp_items:
-                        item.label = tk.Label(self.items_zone, text=item.name)
-                        item.label.place(x=0, y=position * 16, relwidth=0.6, height=15)
-                        item.label.bind("<Button-3>", item.context_menu)
-                        pop_up_desc.button_description(item.label, item.description, self)
-                        item.num_entry = tk.Entry(self.items_zone, bd=0, justify=tk.CENTER, takefocus=0,
-                                                  bg='SystemMenu')
-                        item.num_entry.insert(0, item.amount)
-                        item.num_entry.place(relx=0.675, x=-10, y=position * 16, width=20, height=15)
-                        item.num_entry.bind("<Button-1>", item.start)
-                        item.num_entry.bind("<Leave>", item.unfocus)
-                        item.num_entry.bind("<FocusOut>", item.take_entry)
-                        tk.Button(self.items_zone, text='-', bd=0, command=item.decrease_amount).place(
-                            relx=0.6, y=position * 16, width=10, height=15)
-                        tk.Button(self.items_zone, text='+', bd=0, command=item.increase_amount).place(
-                            relx=0.75, x=-10, y=position * 16, width=10, height=15)
-                        tk.Label(self.items_zone, text=item.weight).place(
-                            relx=0.75, y=position * 16, relwidth=0.125, height=15)
-                        tk.Label(self.items_zone, text=item.cost).place(
-                            relx=0.875, y=position * 16, relwidth=0.125, height=15)
-                        position += 1
-                    position += 1
-
-                tk.Label(self.items_zone, bg='#AAA').place(relx=0.6, y=0, width=1, relheight=1)
-                tk.Label(self.items_zone, bg='#AAA').place(relx=0.75, y=0, width=1, relheight=1)
-                tk.Label(self.items_zone, bg='#AAA').place(relx=0.875, y=0, width=1, relheight=1)
-            else:
-                self.total_costs['text'] = 'Цена\n' + str(self.owner.total_cost)
-                self.total_weights['text'] = 'Вес\n' + str(self.owner.total_weight)
                 if self.items_zone:
                     self.items_zone.destroy()
                 if self.owner:
@@ -146,6 +112,68 @@ class CharacterImage(tk.Frame):
         elif self.state == 1:
             self.state = 0
             self.refresh()
+
+
+class CharacterInventoryZone(tk.Frame):
+    def __init__(self, root):
+        super().__init__(root)
+        self.place(x=0, y=41, relwidth=1, relheight=1, height=-41)
+        self.refresh()
+
+    def refresh(self):
+        position = 0
+        temp_categories = sorted(list(self.master.owner.container),
+                                 key=lambda x: self.master.select_listbox_menubutton.categories.index(x))
+        for category in temp_categories:
+            category_label = tk.Label(self, text='- '+category, anchor=tk.W, font='Arial 9 bold')
+            category_label.place(x=0, y=position * 16, relwidth=0.6, height=15)
+
+            def hide_category(event):
+                text = event.widget['text'][2:]
+                if text in event.widget.master.master.owner.categories_hidden:
+                    # show it
+                    print(event.widget.master.master.owner.categories_hidden)
+                    event.widget.master.master.owner.categories_hidden.remove(text)
+                    event.widget.master.master.refresh()
+                else:
+                    # hide it
+                    print(event.widget.master.master.owner.categories_hidden)
+                    event.widget.master.master.owner.categories_hidden.append(text)
+                    event.widget.master.master.refresh()
+
+            category_label.bind('<Button-1>', hide_category)
+
+            position += 1
+            if category in self.master.owner.categories_hidden:
+                category_label['text'] = '+ ' + category_label['text'][2:]
+                continue
+            temp_items = sorted(self.master.owner.container[category])
+            for item in temp_items:
+                item.label = tk.Label(self, text=item.name)
+                item.label.place(x=0, y=position * 16, relwidth=0.6, height=15)
+                item.label.bind("<Button-3>", item.context_menu)
+                pop_up_desc.button_description(item.label, item.description, self)
+                item.num_entry = tk.Entry(self, bd=0, justify=tk.CENTER, takefocus=0,
+                                          bg='SystemMenu')
+                item.num_entry.insert(0, item.amount)
+                item.num_entry.place(relx=0.675, x=-10, y=position * 16, width=20, height=15)
+                item.num_entry.bind("<Button-1>", item.start)
+                item.num_entry.bind("<Leave>", item.unfocus)
+                item.num_entry.bind("<FocusOut>", item.take_entry)
+                tk.Button(self, text='-', bd=0, command=item.decrease_amount).place(
+                    relx=0.6, y=position * 16, width=10, height=15)
+                tk.Button(self, text='+', bd=0, command=item.increase_amount).place(
+                    relx=0.75, x=-10, y=position * 16, width=10, height=15)
+                tk.Label(self, text=item.weight).place(
+                    relx=0.75, y=position * 16, relwidth=0.125, height=15)
+                tk.Label(self, text=item.cost).place(
+                    relx=0.875, y=position * 16, relwidth=0.125, height=15)
+                position += 1
+            position += 1
+
+        tk.Label(self, bg='#AAA').place(relx=0.6, y=0, width=1, relheight=1)
+        tk.Label(self, bg='#AAA').place(relx=0.75, y=0, width=1, relheight=1)
+        tk.Label(self, bg='#AAA').place(relx=0.875, y=0, width=1, relheight=1)
 
 
 class CharacterStatesZone(tk.Frame):
