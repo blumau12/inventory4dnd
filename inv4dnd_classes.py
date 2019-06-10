@@ -177,13 +177,13 @@ class CharacterStatesZone(tk.Frame):
     def __init__(self, root):
         super().__init__(root)
         # галочки ------------------------------------------------------------------------------------------------------
-        self.darkvision_var = tk.IntVar()
-        self.darkvision_var.set(self.master.owner.darkvision)
-        self.darkvision_checkbutton = tk.Checkbutton(self, text='Темновидение', font='Cambria 11',
-                                                     activeforeground='blue', var=self.darkvision_var,
-                                                     command=self.darkvision_do)
-        self.darkvision_var.checkbutton = self.darkvision_checkbutton
-        self.darkvision_checkbutton.place(x=-21, y=0, height=15)
+        self.dark_vision_var = tk.IntVar()
+        self.dark_vision_var.set(self.master.owner.dark_vision)
+        self.dark_vision_checkbutton = tk.Checkbutton(self, text='Темновидение', font='Cambria 11',
+                                                      activeforeground='blue', var=self.dark_vision_var,
+                                                      command=self.dark_vision_do)
+        self.dark_vision_var.checkbutton = self.dark_vision_checkbutton
+        self.dark_vision_checkbutton.place(x=-21, y=0, height=15)
 
         self.concentration_var = tk.IntVar()
         self.concentration_var.set(self.master.owner.concentration)
@@ -268,10 +268,10 @@ class CharacterStatesZone(tk.Frame):
         self.place(x=0, y=41, relwidth=1, relheight=1, height=-41)
         self.refresh()
 
-    def darkvision_do(self):
-        value = int(self.darkvision_var.get())
-        self.master.owner.darkvision = value
-        self.darkvision_checkbutton['fg'] = ['#DDD', 'blue'][value]
+    def dark_vision_do(self):
+        value = int(self.dark_vision_var.get())
+        self.master.owner.dark_vision = value
+        self.dark_vision_checkbutton['fg'] = ['#DDD', 'blue'][value]
 
     def concentration_do(self):
         value = int(self.concentration_var.get())
@@ -377,7 +377,7 @@ class CharacterStatesZone(tk.Frame):
         self.refresh()
 
     def refresh(self):
-        self.darkvision_do()
+        self.dark_vision_do()
         self.concentration_do()
         self.exhausted_do()
         self.hp_total.delete(0, tk.END)
