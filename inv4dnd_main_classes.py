@@ -14,7 +14,7 @@ class Character:
         self.image = None
         self.categories_hidden = []
 
-        self.darkvision = False
+        self.dark_vision = False
         self.concentration = False
         self.exhausted = False
         self.passive_perception = 0
@@ -133,7 +133,8 @@ class Item:
     def context_menu(self, event):
         menu = tk.Menu(self.label.master, tearoff=0)
         menu.add_command(label='Изменить описание', command=lambda: EditItemDescriptionWindow(self.label.master, self))
-        menu.add_command(label='Удалить "' + self.name + '"', command=lambda: self.owner.remove_item(self))
+        menu.add_command(label='Отдать', command=lambda: MoveItemWindow(self.label.master, self))
+        menu.add_command(label='Удалить "{0}"'.format(self.name), command=lambda: self.owner.remove_item(self))
         menu.post(event.x_root, event.y_root)
 
     def __repr__(self):
@@ -170,6 +171,45 @@ class EditItemDescriptionWindow(tk.Toplevel):
         else:
             self.item.name = self.item.name[::-1].replace('...', '', 1)[::-1]
         self.item.label.master.master.refresh()
+        self.destroy()
+
+
+class MoveItemWindow(tk.Toplevel):
+    def __init__(self, root, item):
+        super().__init__(root)
+        self.title('Move '+item.name)
+        self.geometry('400x200+400+400')
+        self.grab_set()
+        self.focus_set()
+        self.item = item
+
+        scrollbar_src = tk.Scrollbar(self, orient=tk.VERTICAL, bd=0)
+        self.characters_lb = tk.Listbox(self, yscrollcommand=scrollbar_src.set, activestyle='none', bd=0)
+        self.characters_lb.place(relwidth=1, width=-40, relheight=1)
+        scrollbar_src.config(command=self.characters_lb.yview)
+        scrollbar_src.place(x=250, y=0, relheight=1, height=-40)
+
+        for character in self.master.master.all_characters:
+            if character is not self.master.master.owner:
+                self.characters_lb.insert(tk.END, character)
+
+        tk.Button(self, bg='#22B14C', activebackground='#00CC00', text='Ok', fg='white', activeforeground='white',
+                  bd=0, command=self.apply).place(relx=1, x=-40, width=40, relheight=1)
+
+    def apply(self):
+        old_owner = self.item.owner
+        self.item.owner.container[self.item.category].remove(self.item)
+        new_char_name = self.characters_lb.get(self.characters_lb.curselection())
+        cc = [char for char in self.master.master.all_characters if char.name == new_char_name]
+        if cc:
+            cc = cc[0]
+        self.item.owner = cc
+        if self.item.category not in self.item.owner.container:
+            self.item.owner.container[self.item.category] = []
+        self.item.owner.container[self.item.category].append(self.item)
+        if self.item.owner.is_displayed:
+            self.item.owner.image.refresh()
+        old_owner.image.refresh()
         self.destroy()
 
 

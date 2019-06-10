@@ -11,6 +11,7 @@ class CharacterImage(tk.Frame):
 
         self.root = root
         self.listbox = listbox
+        self.all_characters = all_characters
         self.custom_item_frame = custom_item_frame
         self.search_frame = search_frame
         self.select_listbox_menubutton = select_listbox_menubutton
@@ -122,9 +123,7 @@ class CharacterInventoryZone(tk.Frame):
 
     def refresh(self):
         position = 0
-        temp_categories = sorted(list(self.master.owner.container),
-                                 key=lambda x: self.master.select_listbox_menubutton.categories.index(x))
-        for category in temp_categories:
+        for category in sorted(list(self.master.owner.container), key=lambda x: self.master.select_listbox_menubutton.categories.index(x)):
             category_label = tk.Label(self, text='- '+category, anchor=tk.W, font='Arial 9 bold')
             category_label.place(x=0, y=position * 16, relwidth=0.6, height=15)
 
@@ -147,9 +146,9 @@ class CharacterInventoryZone(tk.Frame):
             if category in self.master.owner.categories_hidden:
                 category_label['text'] = '+ ' + category_label['text'][2:]
                 continue
-            temp_items = sorted(self.master.owner.container[category])
-            for item in temp_items:
+            for item in sorted(self.master.owner.container[category]):
                 item.label = tk.Label(self, text=item.name)
+                item.label.item = item
                 item.label.place(x=0, y=position * 16, relwidth=0.6, height=15)
                 item.label.bind("<Button-3>", item.context_menu)
                 pop_up_desc.button_description(item.label, item.description, self)
@@ -627,7 +626,7 @@ class SelectListboxMenubutton(tk.Menubutton):
         self.place(x=0, y=41, relwidth=1, width=-1, height=20)
 
 
-class Menubar(tk.Frame):
+class MenuBar(tk.Frame):
     def __init__(self, root, all_characters, lb_frame, holder):
         super().__init__(root, bg='SystemMenu')
         self.root = root

@@ -32,7 +32,7 @@ holder.character_images = []
 for i in range(5):
     holder.character_images.append(CharacterImage(holder, lb1, i, all_characters, custom_item_frame, search_frame,
                                    select_listbox_menubutton))
-test = Menubar(holder, all_characters, lb1, holder)
+test = MenuBar(holder, all_characters, lb1, holder)
 # ----------------------------------------------------------------------------------------------------------------------
 main.protocol("WM_DELETE_WINDOW", on_closing)
 
