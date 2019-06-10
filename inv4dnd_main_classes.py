@@ -208,12 +208,7 @@ class MoveItemWindow(tk.Toplevel):
         new_char = [char for char in self.master.master.all_characters if char.name == new_char_name]
         if new_char:
             new_char = new_char[0]
-        self.item.owner = new_char
-        if self.item.category not in self.item.owner.container:
-            self.item.owner.container[self.item.category] = []
-        self.item.owner.container[self.item.category].append(self.item)
-        if self.item.owner.is_displayed:
-            self.item.owner.image.refresh()
+            new_char.add_item(self.item)
 
         old_owner.image.refresh()
         self.destroy()

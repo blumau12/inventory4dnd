@@ -13,7 +13,7 @@ def verify_attr(old_object, attr_name, new_object):
 
 for old_character in old_characters:
     new_character = Character(old_character.name)
-    attrs = ['name', 'container', 'total_cost', 'total_weight', 'company', 'is_displayed', 'image', 'categories_hidden',
+    attrs = ['name', 'company', 'categories_hidden',
              'dark_vision', 'concentration', 'exhausted', 'passive_perception', 'hp_total', 'hp_temp', 'states',
              'saving_throws', 'armor', 'armor_temp', 'exp', 'stabilization', 'abilities', 'conditions',
              'spell_saving_throws', 'hit_dices']
@@ -24,7 +24,7 @@ for old_character in old_characters:
     for category in old_character.container:
         for item in old_character.container[category]:
             new_item = Item(item.category, item.name, item.cost, item.weight)
-            attrs = ['category', 'name', 'cost', 'weight', 'description', 'amount', 'owner', 'label', 'num_entry', 'old_data']
+            attrs = ['category', 'name', 'cost', 'weight', 'description', 'amount', 'label', 'num_entry', 'old_data']
             for attr in attrs:
                 verify_attr(item, attr, new_item)
             new_character.add_item(new_item)
