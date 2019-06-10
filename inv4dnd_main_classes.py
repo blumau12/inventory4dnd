@@ -197,18 +197,24 @@ class MoveItemWindow(tk.Toplevel):
                   bd=0, command=self.apply).place(relx=1, x=-40, width=40, relheight=1)
 
     def apply(self):
+        if not self.characters_lb.curselection():
+            return
         old_owner = self.item.owner
         self.item.owner.container[self.item.category].remove(self.item)
+        if not self.item.owner.container[self.item.category]:
+            self.item.owner.container.pop(self.item.category)
+
         new_char_name = self.characters_lb.get(self.characters_lb.curselection())
-        cc = [char for char in self.master.master.all_characters if char.name == new_char_name]
-        if cc:
-            cc = cc[0]
-        self.item.owner = cc
+        new_char = [char for char in self.master.master.all_characters if char.name == new_char_name]
+        if new_char:
+            new_char = new_char[0]
+        self.item.owner = new_char
         if self.item.category not in self.item.owner.container:
             self.item.owner.container[self.item.category] = []
         self.item.owner.container[self.item.category].append(self.item)
         if self.item.owner.is_displayed:
             self.item.owner.image.refresh()
+
         old_owner.image.refresh()
         self.destroy()
 

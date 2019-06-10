@@ -131,12 +131,10 @@ class CharacterInventoryZone(tk.Frame):
                 text = event.widget['text'][2:]
                 if text in event.widget.master.master.owner.categories_hidden:
                     # show it
-                    print(event.widget.master.master.owner.categories_hidden)
                     event.widget.master.master.owner.categories_hidden.remove(text)
                     event.widget.master.master.refresh()
                 else:
                     # hide it
-                    print(event.widget.master.master.owner.categories_hidden)
                     event.widget.master.master.owner.categories_hidden.append(text)
                     event.widget.master.master.refresh()
 
