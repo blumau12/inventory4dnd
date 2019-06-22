@@ -3,7 +3,7 @@ from tkinter import messagebox
 import pickle
 import utilities.pop_up_desc as pop_up_desc
 from items_from_csv import categories
-from basic_widgets import *
+from utilities.basic_widgets import *
 
 
 class CharacterImage(tk.Frame):

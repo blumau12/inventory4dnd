@@ -36,14 +36,18 @@ class Character:
         self.name = new_name
 
     def add_item(self, item):
-        if item.category in self.container:
-            for existing_item in self.container[item.category]:
-                if item.name == existing_item.name:
-                    item.name += ' +'
+        if item.category not in self.container:
+            self.container[item.category] = []
+
+        just_add_amount = False
+        for existing_item in self.container[item.category]:
+            if item.name == existing_item.name and item.weight == existing_item.weight and item.cost == existing_item.cost:
+                existing_item.amount += item.amount
+                just_add_amount = True
+        if not just_add_amount:
             self.container[item.category].append(item)
-        else:
-            self.container[item.category] = [item]
         item.owner = self
+
         self.calculate_cost_weight()
         if self.image:
             self.image.refresh()
@@ -178,14 +182,14 @@ class MoveItemWindow(tk.Toplevel):
     def __init__(self, root, item):
         super().__init__(root)
         self.title('Move '+item.name)
-        self.geometry('400x200+400+400')
+        self.geometry('400x300+400+350')
         self.grab_set()
         self.focus_set()
         self.item = item
 
         scrollbar_src = tk.Scrollbar(self, orient=tk.VERTICAL, bd=0)
         self.characters_lb = tk.Listbox(self, yscrollcommand=scrollbar_src.set, activestyle='none', bd=0)
-        self.characters_lb.place(relwidth=1, width=-40, relheight=1)
+        self.characters_lb.place(relwidth=1, width=-40, relheight=1, height=-40)
         scrollbar_src.config(command=self.characters_lb.yview)
         scrollbar_src.place(x=250, y=0, relheight=1, height=-40)
 
@@ -193,22 +197,40 @@ class MoveItemWindow(tk.Toplevel):
             if character is not self.master.master.owner:
                 self.characters_lb.insert(tk.END, character)
 
+        self.amount_entry = tk.Entry(self, bd=0, bg='#DDD', justify=tk.CENTER, font='Cambria 14')
+        self.amount_entry.insert(0, str(self.item.amount))
+        self.amount_entry.place(relx=1, rely=1, x=-180, y=-40, height=40, width=60)
+        self.amount_entry.bind("<Button-1>", self.item.start)
+        self.amount_entry.bind("<Leave>", self.item.unfocus)
+
+        tk.Label(self, text='of'.format(self.item.amount), font='Cambria 14').place(relx=1, rely=1, x=-120, y=-40, height=40, width=20)
+        tk.Label(self, text=str(self.item.amount), font='Cambria 14').place(relx=1, rely=1, x=-100, y=-40, height=40, width=60)
+
         tk.Button(self, bg='#22B14C', activebackground='#00CC00', text='Ok', fg='white', activeforeground='white',
                   bd=0, command=self.apply).place(relx=1, x=-40, width=40, relheight=1)
 
     def apply(self):
-        if not self.characters_lb.curselection():
+        if not self.characters_lb.curselection() or not self.amount_entry.get():
+            return
+        try:
+            how_much = int(self.amount_entry.get())
+        except ValueError:
             return
         old_owner = self.item.owner
-        self.item.owner.container[self.item.category].remove(self.item)
-        if not self.item.owner.container[self.item.category]:
-            self.item.owner.container.pop(self.item.category)
+
+        self.item.amount = self.item.amount - how_much
+        if not self.item.amount:
+            self.item.owner.container[self.item.category].remove(self.item)
+            if not self.item.owner.container[self.item.category]:
+                self.item.owner.container.pop(self.item.category)
 
         new_char_name = self.characters_lb.get(self.characters_lb.curselection())
         new_char = [char for char in self.master.master.all_characters if char.name == new_char_name]
         if new_char:
             new_char = new_char[0]
-            new_char.add_item(self.item)
+            new_item = Item(self.item.category, self.item.name, self.item.weight, self.item.cost)
+            new_item.amount = how_much
+            new_char.add_item(new_item)
 
         old_owner.image.refresh()
         self.destroy()
