@@ -3,6 +3,7 @@ from tkinter import messagebox
 import pickle
 import utilities.pop_up_desc as pop_up_desc
 from items_from_csv import categories
+from basic_widgets import *
 
 
 class CharacterImage(tk.Frame):
@@ -20,30 +21,22 @@ class CharacterImage(tk.Frame):
         self.states = ['inventory', 'states']
         self.state = 0
         self.states_label = None
+        self.items_zone = None
 
-        self.header = tk.Frame(self, bg='red')
-        self.header.place(height=40, relwidth=1, width=-17)
+        self.name_label = Btn(self, '', '#EEE', command=self.try_add_item, font='Cambria 14')
+        self.name_label.place(relwidth=0.6, height=40)
 
-        self.name_label = tk.Button(self.header, bd=0, bg='#EEE', justify=tk.CENTER, font='Cambria 14',
-                                    command=self.try_add_item, activebackground='#F7F7F7')
-        self.name_label.place(relwidth=0.6, relheight=1)
-        self.choose_character_button = tk.Button(self.header, text='~', bd=0, bg='#EEE', activebackground='#F7F7F7',
-                                                 command=lambda: AttachCharacterWindow(self.root, self, all_characters))
-        self.choose_character_button.place(relx=0.6, relwidth=0.05, relheight=1, width=30)
+        self.choose_character_button = Btn(self, text='~', color='#EEE',
+                                           command=lambda: AttachCharacterWindow(self.root, self, all_characters))
+        self.choose_character_button.place(relx=0.6, relwidth=0.15, height=40)
 
-        self.total_weights = tk.Label(self.header, text='Вес\n', bg='#EEE')
-        self.total_weights.place(relx=0.75, relwidth=0.125, relheight=1)
-        self.total_costs = tk.Label(self.header, text='Цена\n', bg='#EEE')
-        self.total_costs.place(relx=0.875, relwidth=0.125, relheight=1)
-        tk.Label(self, bg='#AAA').place(x=0, y=40, relwidth=1, height=1)
-        tk.Label(self.header, bg='#AAA').place(relx=0.6, y=0, width=1, relheight=1)
-        tk.Label(self.header, bg='#AAA').place(relx=0.75, y=0, width=1, relheight=1)
-        tk.Label(self.header, bg='#AAA').place(relx=0.875, y=0, width=1, relheight=1)
+        self.total_weights = tk.Label(self, text='Вес\n', bg='#DDD')
+        self.total_weights.place(relx=0.75, relwidth=0.125, height=40)
 
-        self.items_zone = tk.Frame(self)
-        self.items_zone.place(x=0, y=41, relwidth=1, relheight=1, width=-17, height=-41)
+        self.total_costs = tk.Label(self, text='Цена\n', bg='#DDD')
+        self.total_costs.place(relx=0.875, relwidth=0.125, height=40)
 
-        self.place(x=40 + number * 301, y=41, width=300, relheight=1, height=-41)
+        self.place(x=41 + number * 300, y=0, width=300, relheight=1)
 
     def attach_a_character(self, owner):
         self.owner = owner
@@ -117,7 +110,7 @@ class CharacterInventoryZone(tk.Frame):
 
     def refresh(self):
         position = 0
-        for category in sorted(list(self.master.owner.container), key=lambda x: self.master.select_listbox_menubutton.categories.index(x)):
+        for category in self.master.owner.container:
             category_label = tk.Label(self, text='- '+category, anchor=tk.W, font='Arial 9 bold')
             category_label.place(x=0, y=position * 16, relwidth=0.6, height=15)
 
@@ -139,7 +132,7 @@ class CharacterInventoryZone(tk.Frame):
                 category_label['text'] = '+ ' + category_label['text'][2:]
                 continue
             for item in sorted(self.master.owner.container[category]):
-                item.label = tk.Label(self, text=item.name)
+                item.label = tk.Label(self, text=item.name, anchor=tk.W)
                 item.label.item = item
                 item.label.place(x=0, y=position * 16, relwidth=0.6, height=15)
                 item.label.bind("<Button-3>", item.context_menu)
@@ -162,9 +155,10 @@ class CharacterInventoryZone(tk.Frame):
                 position += 1
             position += 1
 
-        tk.Label(self, bg='#AAA').place(relx=0.6, y=0, width=1, relheight=1)
-        tk.Label(self, bg='#AAA').place(relx=0.75, y=0, width=1, relheight=1)
-        tk.Label(self, bg='#AAA').place(relx=0.875, y=0, width=1, relheight=1)
+        tk.Label(self, bg='#AAA').place(x=-1, relx=0.6, y=0, width=1, relheight=1)
+        tk.Label(self, bg='#AAA').place(x=-1, relx=0.75, y=0, width=1, relheight=1)
+        tk.Label(self, bg='#AAA').place(x=-1, relx=0.875, y=0, width=1, relheight=1)
+        tk.Label(self, bg='#AAA').place(x=-1, relx=1, y=0, width=1, relheight=1)
 
 
 class CharacterStatesZone(tk.Frame):
@@ -195,8 +189,8 @@ class CharacterStatesZone(tk.Frame):
         self.exhausted_var.checkbutton = self.exhausted_checkbutton
         self.exhausted_checkbutton.place(x=-21, y=32, height=15)
         # --------------------------------------------------------------------------------------------------------------
-        tk.Label(self, bg='#AAA').place(relx=0.4, width=1, height=54)
-        tk.Label(self, bg='#AAA').place(y=53, relwidth=1, height=0)
+        #tk.Label(self, bg='#AAA').place(relx=0.4, width=1, height=54)
+        #tk.Label(self, bg='#AAA').place(y=53, relwidth=1, height=0)
         tk.Label(self, text='ХП\n~', font='Cambria 11', anchor=tk.E).place(x=180, y=5, width=40, height=40)
         tk.Label(self, text='/\n/', font='Cambria 11', anchor=tk.E).place(x=155, y=5, width=10, height=40)
         self.hp_total = tk.Entry(self, bd=0, fg='green', bg='SystemMenu', font='Cambria 12', justify=tk.CENTER)
@@ -217,8 +211,8 @@ class CharacterStatesZone(tk.Frame):
         self.hp_temp_max.bind('<Button-1>', self.start_hp_temp_max)
         self.hp_temp_max.bind('<Leave>', self.get_hp_temp_max)
         # --------------------------------------------------------------------------------------------------------------
-        tk.Label(self, bg='#AAA').place(y=53, relwidth=1, height=0)
-        tk.Label(self, bg='#AAA').place(relx=0.75, width=1, height=60)
+        #tk.Label(self, bg='#AAA').place(y=53, relwidth=1, height=0)
+        #tk.Label(self, bg='#AAA').place(relx=0.75, width=1, height=60)
         tk.Label(self, text='Пассивное\nвосприятие:', font='Cambria 9').place(relx=0.75, x=1, y=0, relwidth=0.25, width=-1, height=30)
         self.passive_perception_entry = tk.Entry(self, bd=0, bg='#EEE', font='Cambria 10')
         self.passive_perception_entry.place(relx=0.85, y=32, relwidth=0.05, height=15)
@@ -605,14 +599,12 @@ class MenuBar(tk.Frame):
         self.lb_frame = lb_frame
         self.holder = holder
 
-        tk.Button(self, text='Инв/\nстаты', bg='#c9efff', activebackground='#c9efff', bd=0,
-                  command=self.switch_char_images).place(x=0, y=0, relwidth=1, height=40)
-        self.hide_show_button = tk.Button(self, command=self.hide_show_itemslbframe, bd=0, fg='white',
-                                          activeforeground='white', bg='#BBB', activebackground='#CCC', text='-',
-                                          font='Arial 15')
-        self.hide_show_button.place(x=0, rely=1, y=-39, relwidth=1, height=39)
+        Btn(self, text='Инв/\nстаты', color='#ACF', command=self.switch_char_images).place(x=0, y=0, relwidth=1, height=40)
+        self.hide_show_button = Btn(self, text='-', color='#BBB', command=self.hide_show_itemslbframe,
+                                    fg='white', activeforeground='white', font='Arial 15')
+        self.hide_show_button.place(x=0, rely=1, y=-40, relwidth=1, height=40)
 
-        self.place(x=0, y=41, width=39, relheight=1, height=-41)
+        self.place(x=0, y=0, width=40, relheight=1)
 
     def switch_char_images(self):
         for image in self.root.character_images:
@@ -636,7 +628,7 @@ class CompanyBar(tk.Frame):
         super().__init__(root, bg='SystemMenu')
         self.place(relwidth=1, height=40, width=-268)
 
-        self.company_button = tk.Button(self, text=current_company, relief=tk.GROOVE)
+        self.company_button = Btn(self, 'How about', color='#0AF', command=lambda: 1)
         self.company_button.place(relx=1, x=-150, y=1, relheight=1, width=150, height=-1)
 
 
